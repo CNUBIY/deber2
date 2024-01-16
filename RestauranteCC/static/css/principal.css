@@ -1,0 +1,31 @@
+label.error{
+  color:red;
+  font-weight: bold;
+  font-size: 14px;
+  }
+
+input.error, select.error, textarea.error{
+    border: 1px solid red;
+}
+
+div.dt-buttons {
+    margin-bottom: 10px; /* Espacio entre los botones y la tabla */
+}
+
+.button2 {
+    background-color: #597E52; /* Color de fondo */
+    color: white; /* Color del texto */
+    padding: 10px 20px; /* Espaciado interno del botón */
+    border: none; /* Sin borde */
+    text-align: center; /* Alineación del texto */
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px; /* Bordes redondeados */
+}
+
+.button2:hover {
+    background-color: #45a049; /* Cambia el color de fondo al pasar el mouse */
+}

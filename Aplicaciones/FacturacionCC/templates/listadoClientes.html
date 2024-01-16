@@ -1,0 +1,178 @@
+{% extends "./plantilla.html" %}
+{% block contenido %}
+    <h1><i class="fa-solid fa-user"></i> Listado de Clientes</h1>
+    <div class="row">
+      <div class="col-md-5">
+        <form class="" action="/guardarCliente/" method="post" enctype="multipart/form-data" id="frm_nuevo_cliente">
+          {% csrf_token %}
+          <b>Tipo de Cliente</b>
+          <select class="form-control" name="id_provincia" id="id_provincia" required>
+            <option value="">Seleccione su provincia</option>
+            {% for provincia in provincias %}
+            <option value="{{provincia.id_cc}}">{{provincia.nombre_cc}}</option>
+            {% endfor %}
+          </select>
+          <br>
+          <b>No Cedula:</b>
+          <input type="number" name="cedula_cc" id="cedula_cc" value="" placeholder="Ingrese la cédula del cliente" class="form-control" required><br>
+          <b>Nombres: </b>
+          <input type="text" name="nombre_cc" id="nombre_cc" value="" placeholder="Ingrese el nombre del cliente" class="form-control" required><br>
+          <script>
+            document.getElementById('nombre_cc').addEventListener('input', function() {
+              var inputLetras = document.getElementById('nombre_cc');
+              var valor = inputLetras.value;
+
+              var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+              inputLetras.value = soloLetras;
+            });
+          </script>
+          <b>Correo: </b>
+          <input type="email" name="correo_cc" id="correo_cc" value="" placeholder="Ingrese el nombre" class="form-control" required><br>
+          &nbsp; &nbsp;&nbsp;<button type="submit" name="button" class="btn btn-outline-success">Guardar</button>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <button type="reset" name="button" class="btn btn-outline-danger">Cancelar</button>
+        </form>
+      </div>
+      <div class="col-md-7">
+        <br>
+        <table class="table" id="tbl_cliente">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>CEDULA</th>
+              <th>NOMBRE</th>
+              <th>CORREO</th>
+              <th>PROVINCIA</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cliente in clientes %}
+              <tr>
+                <td>{{cliente.id_cc}}</td>
+                <td>{{cliente.cedula_cc}}</td>
+                <td>{{cliente.nombre_cc}}</td>
+                <td>{{cliente.correo_cc}}</td>
+                <td>{{cliente.provincia_cc.nombre_cc}}</td>
+                <td>
+                      <a href="/editarCliente/{{cliente.id_cc}}" class="btn btn-outline-secondary">Editar</a><br><br>
+                      <a href="javascript:void(0)"onclick="eliminarCliente('/eliminarCliente/{{cliente.id_cc}}');" class="btn btn-outline-warning">Eliminar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+            function eliminarCliente(url){
+              iziToast.question({
+                  timeout: 15000,
+                  close: true,
+                  overlay: true,
+                  displayMode: 'once',
+                  id: 'question',
+                  zindex: 999,
+                  title: 'CONFIRMACIÓN',
+                  message: '¿Está seguro de eliminar el <b>cliente </b> seleccionado?',
+                  position: 'center',
+                  buttons: [
+                      ['<button><b>SI</b></button>', function (instance, toast) {
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                          window.location.href=url;
+                      }, true],
+                      ['<button>NO</button>', function (instance, toast) {
+
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                      }],
+                  ]
+              });
+            }
+
+            // Muestra un mensaje de éxito para el guardado
+    {% if messages %}
+        {% for message in messages %}
+            iziToast.success({
+                title: 'Éxito',
+                message: '{{ message }}',
+                position: 'topRight',
+            });
+        {% endfor %}
+    {% endif %}
+      </script>
+    <script type="text/javascript">
+      $("#frm_nuevo_cliente").validate({
+        rules:{
+          "id_provincia":{
+            required:true
+          },
+          "cedula_cc":{
+            required:true,
+            minlength:10,
+            maxlength:10
+          },
+          "nombre_cc":{
+            required:true
+          },
+          "correo_cc":{
+            required:true
+          }
+        },
+        messages:{
+          "id_provincia":{
+            required:"Por favor seleccione la provincia del cliente"
+          },
+          "cedula_cc":{
+            required:"Debe ingresar el número de cédula",
+            minlength:"La cedula debe tener 10 dígitos",
+            maxlength:"La cedula no debe tener más de 10 dígitos"
+          },
+          "nombre_cc":{
+            required:"Debe ingresar su apellido"
+          },
+          "correo_cc":{
+            required:"Debe ingresar su nombre"
+          }
+        }
+      });
+    </script>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#tbl_cliente').DataTable( {
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa-solid fa-file-pdf"></i> Exportar a PDF',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE CLIENTES ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa-solid fa-print"></i> Imprimir',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE CLIENTES ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fa-solid fa-file-csv"></i> Exportar a CSV',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE CLIENTES ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    }
+                ],
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                }
+            } );
+        } );
+    </script>
+{% endblock %}

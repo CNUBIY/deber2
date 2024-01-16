@@ -1,0 +1,114 @@
+{# heredando header y footer #}
+{% extends "./plantilla.html" %}
+{% load static %}
+
+{% block contenido %}
+<h1 style="text-align:center;"> <i class="fas fa-edit"></i> Edita tu información</h1>
+<div class="row">
+  <div class="col-md-2">
+  </div>
+  <div class="col-md-8">
+    <br> <br>
+    <form class="" action="/procesarActualizacionReceta/{{receta.id_cc}} %}" method="post" id="frm_nueva_receta">
+
+      {% csrf_token %}
+      <b>Platillo:</b><br>
+      <select required class="form-control" name="id_platillo" id="id_platillo">
+        <option value="">Seleccione el platillo:</option>
+        {% for platillo in platillos %}
+        <option value="{{platillo.id_cc}}">{{platillo.nombre_cc}}</option>
+        {% endfor %}
+      </select>
+      <br>
+      <b>Ingrediente:</b>
+      {% for ingrediente in ingredientes %}
+          <div class="checkbox">
+              <label for="checkboxes-{{ ingrediente.id_cc }}" required>
+                  <input type="checkbox" name="id_ingrediente" id="checkboxes-{{ ingrediente.id_cc }}" value="{{ ingrediente.id_cc }}">
+                  {{ ingrediente.nombre_cc }}
+              </label>
+          </div>
+      {% endfor %}
+      <br>
+      <input type="hidden" name="id_cc"  value="{{receta.id_cc}}">
+      <b>Tiempo de Cocina</b>
+      <input type="text" name="tiempo_cc" id="tiempo_cc"
+      value="{{receta.tiempo_cc}}" placeholder="Ingrese el tiempo de cocina"
+      class="form-control" required>
+      <br>
+      <b>Origen de Receta: </b>
+      <input type="text" name="origen_cc" id="origen_cc"
+      value="{{receta.origen_cc}}" placeholder="Ingrese el origen de la receta"
+      class="form-control" required>
+      <br>
+
+      <script>
+        document.getElementById('origen_cc').addEventListener('input', function() {
+          var inputLetras = document.getElementById('origen_cc');
+          var valor = inputLetras.value;
+
+          var soloLetras = valor.replace(/[^A-Za-z]/g, '');
+
+          inputLetras.value = soloLetras;
+        });
+      </script>
+
+      <b>Indicaciones: </b><br>
+      <textarea name="indicaciones_cc" id="indicaciones_cc"
+      rows="3" class="form-control"
+      placeholder="Ingrese las indicaciones"
+      >{{receta.indicaciones_cc}}</textarea>
+      <br>
+      <center>
+        <button type="submit" name="button"
+        class="btn btn-outline-succes">
+          &nbsp;&nbsp;&nbsp;Guardar&nbsp;&nbsp;&nbsp;
+        </button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/"
+        class="btn btn-outline-danger">
+          Cancelar
+        </a>
+      </center>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $("#frm_nueva_receta").validate({
+    rules:{
+      "id_platillo":{
+        required:true
+      },
+      "id_ingrediente":{
+        required:true
+      },
+      "tiempo_cc":{
+        required:true
+      },
+      "origen_cc":{
+        required:true,
+      },
+      "indicaciones_cc":{
+        required:true,
+      }
+    },
+    messages:{
+      "id_platillo":{
+        required:"Debe ingresar el platillo"
+      },
+      "id_ingrediente":{
+        required:"Debe ingresar al menos un ingrediente"
+      },
+      "tiempo_cc":{
+        required:"Debe ingresar el tiempo de receta"
+      },
+      "origen_cc":{
+        required:"Debe ingresar el origen de la receta"
+      },
+      "indicaciones_cc":{
+        required:"Debe ingresar las indicaciones de la receta"
+      }
+    }
+  });
+</script>
+{% endblock %}

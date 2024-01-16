@@ -1,0 +1,104 @@
+{# heredando header y footer #}
+{% extends "./plantilla.html" %}
+{% load static %}
+
+{% block contenido %}
+<h1 style="text-align:center;"> <i class="fas fa-edit"></i> Edita tu información</h1>
+<div class="row">
+  <div class="col-md-2">
+  </div>
+  <div class="col-md-8">
+    <br> <br>
+    <form class="" action="/procesarActualizacionPlatillo/{{platillo.id_cc}}" enctype="multipart/form-data" method="post" id="frm_nuevo_platillo">
+      <b>Tipo de platillo: </b>
+      {% csrf_token %}
+      <select class="form-control" name="id_tipo" id="id_tipo">
+        <option value="">Seleccione el tipo de platillo</option>
+        {% for tipo in tipo %}
+        <option value="{{tipo.id_cc}}">{{tipo.nombre_cc}}</option>
+        {% endfor %}
+      </select>
+      <br>
+      <input type="hidden" name="id_cc"  value="{{platillo.id_cc}}">
+      <b>Nombre del platillo: </b>
+      <input type="text" name="nombre_cc" id="nombre_cc"
+      value="{{platillo.nombre_cc}}" placeholder="Ingrese el nombre del platillo"
+      class="form-control" required>
+
+      <script>
+        document.getElementById('nombre_cc').addEventListener('input', function() {
+          var inputLetras = document.getElementById('nombre_cc');
+          var valor = inputLetras.value;
+
+          var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+          inputLetras.value = soloLetras;
+        });
+      </script>
+
+
+      <br>
+      <b>Costo: </b>
+      <input type="number" name="costou_cc" id="costou_cc"
+      value="{{platillo.porciones_cc}}" placeholder="Ingrese el costo unitario del platillo"
+      class="form-control" required>
+      <br>
+      <b>Foto: </b>
+      <input type="file" name="foto_cc" id="foto_cc"
+      value="" placeholder="Seleccione la foto del platillo"
+      class="form-control" required accept="image/*"><br>
+        <center>
+        <button type="submit" name="button"
+        class="btn btn-outline-success">
+          &nbsp;&nbsp;&nbsp;Guardar&nbsp;&nbsp;&nbsp;
+        </button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/listadoPlatillos"
+        class="btn btn-outline-danger">
+          Cancelar
+        </a>
+      </center>
+    </form>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  $("#frm_nuevo_platillo").validate({
+    rules:{
+      "id_tipo":{
+        required:true
+      },
+      "nombre_cc":{
+        required:true
+      },
+      "costou_cc":{
+        required:true,
+         min: 0,
+         number:true,
+         maxlength:7
+      },
+      "foto_cc":{
+        required:true
+      }
+    },
+    messages:{
+      "id_tipo":{
+        required:"Por favor seleccione el tipo de platillo"
+      },
+      "nombre_cc":{
+        required:"Debe ingresar el nombre del platillo"
+      },
+      "costou_cc":{
+        required:"Debe ingresar el costo unitario",
+        min: "No puede ingresar números negativos",
+        number:"Ingrese un valor válido",
+        maxlength:"Precio excedido",
+        step:"Precio inválido"
+      },
+      "foto_cc":{
+        required:"Debe ingresar la foto del platillo"
+      }
+    }
+  });
+</script>
+{% endblock %}

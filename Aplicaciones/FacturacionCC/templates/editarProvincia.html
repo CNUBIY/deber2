@@ -1,0 +1,87 @@
+{# heredando header y footer #}
+{% extends "./plantilla.html" %}
+{% load static %}
+
+{% block contenido %}
+<h1 style="text-align:center;"> <i class="fas fa-edit"></i> Edita tu información</h1>
+<div class="row">
+  <div class="col-md-2">
+  </div>
+  <div class="col-md-8">
+    <br> <br>
+    <form class="" action="/procesarActualizacionProvincia/{{provincia.id_cc}} %}" enctype="multipart/form-data" method="post" id="frm_nueva_provincia">
+        {% csrf_token %}
+      <br>
+      <input type="hidden" name="id_cc"  value="{{provincia.id_cc}}">
+      <b>Nombre de la provincia: </b>
+      <input type="text" name="nombre_cc" id="nombre_cc"
+      value="{{provincia.nombre_cc}}" placeholder="Ingrese el nombre de la provincia"
+      class="form-control" required>
+
+      <script>
+        document.getElementById('nombre_cc').addEventListener('input', function() {
+          var inputLetras = document.getElementById('nombre_cc');
+          var valor = inputLetras.value;
+
+          var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+          inputLetras.value = soloLetras;
+        });
+      </script>
+
+
+      <br>
+      <b>Código de Provincia: </b>
+      <input type="text" name="codigo_cc" id="codigo_cc"
+      value="{{provincia.codigo_cc}}" placeholder="Ingrese el código de la provincia"
+      class="form-control" required>
+      <br>
+      <b>Bandera: </b>
+    <input type="file" name="foto_cc" id="foto_cc" value="" placeholder="Seleccione la foto de la bandera" class="form-control-file" accept="image/*" required><br>
+      <br>
+      <center>
+        <button type="submit" name="button"
+        class="btn btn-outline-success">
+          &nbsp;&nbsp;&nbsp;Guardar&nbsp;&nbsp;&nbsp;
+        </button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/listadoProvincias/"
+        class="btn btn-outline-danger">
+          Cancelar
+        </a>
+      </center>
+    </form>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  $("#frm_nueva_provincia").validate({
+    rules:{
+      "nombre_cc":{
+        required:true
+      },
+      "codigo_cc":{
+        required:true,
+        minlength:2,
+        maxlength:2
+      },
+      "foto_cc":{
+        required:true
+      }
+    },
+    messages:{
+      "nombre_cc":{
+        required:"Debe ingresar el nombre de la provincia",
+      },
+      "codigo_cc":{
+        required:"Debe ingresar el código de la provincia",
+        minlength:"El código solo debe tener dos dígitos",
+        maxlength:"El código solo debe tener dos dígitos"
+      },
+      "foto_cc":{
+        required:"Debe seleccionar la bandera de la Provincia"
+      }
+    }
+  });
+</script>
+{% endblock %}

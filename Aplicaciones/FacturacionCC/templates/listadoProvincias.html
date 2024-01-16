@@ -1,0 +1,172 @@
+{% extends "./plantilla.html" %}
+{% block contenido %}
+    <h1><i class="fa fa-map"></i> Listado de Provincias</h1>
+    <div class="row">
+      <div class="col-md-5">
+        <form class="" action="/guardarProvincia/" method="post" enctype="multipart/form-data" id="frm_nueva_provincia">
+          {% csrf_token %}
+          <br>
+          <b>Nombre de la provincia</b>
+          <input type="text" name="nombre_cc" id="nombre_cc" value="" placeholder="Ingrese el nombre de la provincia" class="form-control" required><br>
+
+          <script>
+            document.getElementById('nombre_cc').addEventListener('input', function() {
+              var inputLetras = document.getElementById('nombre_cc');
+              var valor = inputLetras.value;
+
+              var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+              inputLetras.value = soloLetras;
+            });
+          </script>
+
+          <b>Código de provincia (Dos dígitos): </b>
+          <input type="number" name="codigo_cc" id="codigo_cc" value="" placeholder="Ingrese el código de la provincia" class="form-control" required><br>
+          <b>Bandera de la provincia: </b>
+          <input type="file" name="foto_cc" id="foto_cc" value="" placeholder="Seleccione la foto de la bandera" class="form-control-file" accept="image/*" required><br>
+          &nbsp; &nbsp;&nbsp;<button type="submit" name="button" class="btn btn-outline-success">Guardar</button>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <button type="reset" name="button" class="btn btn-outline-danger">Cancelar</button>
+        </form>
+      </div>
+      <div class="col-md-7">
+        <br>
+        <table class="table" id="tbl_provincia">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>NOMBRE</th>
+              <th>CÓDIGO</th>
+              <th>BANDERA</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for provincia in provincias %}
+              <tr>
+                <td>{{provincia.id_cc}}</td>
+                <td>{{provincia.nombre_cc}}</td>
+                <td>{{provincia.codigo_cc}}</td>
+                <td>
+                  {% if provincia.foto_cc %}
+                  <a href="{{provincia.foto_cc.url}}" alt="" target="_blank">
+                  <img src="{{provincia.foto_cc.url}}" alt="" style="width:100%; height:60px;"></a>
+                  {% else %}
+                    <b>N/A</b>
+                  {% endif %}
+                </td>
+                <td>
+                    <a href="/editarProvincia/{{provincia.id_cc}}" class="btn btn-outline-secondary">Editar</a>&nbsp;&nbsp;&nbsp;
+                    <a href="javascript:void(0)"onclick="eliminarProvincia('/eliminarProvincia/{{provincia.id_cc}}');" class="btn btn-outline-warning">Eliminar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+            function eliminarProvincia(url){
+              iziToast.question({
+                  timeout: 15000,
+                  close: true,
+                  overlay: true,
+                  displayMode: 'once',
+                  id: 'question',
+                  zindex: 999,
+                  title: 'CONFIRMACIÓN',
+                  message: '¿Está seguro de eliminar la <b>provincia </b> seleccionada?',
+                  position: 'center',
+                  buttons: [
+                      ['<button><b>SI</b></button>', function (instance, toast) {
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                          window.location.href=url;
+                      }, true],
+                      ['<button>NO</button>', function (instance, toast) {
+
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                      }],
+                  ]
+              });
+            }
+
+
+    {% if messages %}
+        {% for message in messages %}
+            iziToast.success({
+                title: 'Éxito',
+                message: '{{ message }}',
+                position: 'topRight',
+            });
+        {% endfor %}
+    {% endif %}
+      </script>
+    <script type="text/javascript">
+      $("#frm_nueva_provincia").validate({
+        rules:{
+          "nombre_cc":{
+            required:true
+          },
+          "codigo_cc":{
+            required:true,
+            minlength:2,
+            maxlength:2
+          },
+          "foto_cc":{
+            required:true
+          }
+        },
+        messages:{
+          "nombre_cc":{
+            required:"Debe ingresar el nombre de la provincia",
+          },
+          "codigo_cc":{
+            required:"Debe ingresar el código de la provincia",
+            minlength:"El código solo debe tener dos dígitos",
+            maxlength:"El código solo debe tener dos dígitos"
+          },
+          "foto_cc":{
+            required:"Debe seleccionar la bandera de la Provincia"
+          }
+        }
+      });
+    </script>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#tbl_provincia').DataTable( {
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa-solid fa-file-pdf"></i> Exportar a PDF',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE PROVINCIAS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa-solid fa-print"></i> Imprimir',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE PROVINCIAS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fa-solid fa-file-csv"></i> Exportar a CSV',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE PROVINCIAS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    }
+                ],
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                }
+            } );
+        } );
+    </script>
+{% endblock %}

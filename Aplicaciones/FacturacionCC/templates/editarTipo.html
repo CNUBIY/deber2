@@ -1,0 +1,97 @@
+{# heredando header y footer #}
+{% extends "./plantilla.html" %}
+{% load static %}
+
+{% block contenido %}
+<h1 style="text-align:center;"> <i class="fas fa-edit"></i> Edita tu información</h1>
+<div class="row">
+  <div class="col-md-2">
+  </div>
+  <div class="col-md-8">
+    <br> <br>
+    <form class="" action="/procesarActualizacionTipo/{{tipo.id_cc}} %}" method="post" id="frm_nuevo_tipo">
+        {% csrf_token %}
+      <br>
+      <input type="hidden" name="id_cc"  value="{{tipo.id_cc}}">
+      <b>Nombre del tipo de platillo: </b>
+      <input type="text" name="nombre_cc" id="nombre_cc"
+      value="{{tipo.nombre_cc}}" placeholder="Ingrese el nombre del tipo de platillo"
+      class="form-control" required>
+      <br>
+
+      <script>
+        document.getElementById('nombre_cc').addEventListener('input', function() {
+          var inputLetras = document.getElementById('nombre_cc');
+          var valor = inputLetras.value;
+
+          var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+          inputLetras.value = soloLetras;
+        });
+      </script>
+
+
+
+      <b>Dificultad de tipo de platillo: </b>
+      <input type="text" name="dificultad_cc" id="dificultad_cc"
+      value="{{tipo.dificultad_cc}}" placeholder="Ingrese la dificultad del tipo de platillo"
+      class="form-control" required>
+      <br>
+
+
+      <script>
+        document.getElementById('dificultad_cc').addEventListener('input', function() {
+          var inputLetras = document.getElementById('dificultad_cc');
+          var valor = inputLetras.value;
+
+          var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+          inputLetras.value = soloLetras;
+        });
+      </script>
+
+      <b>Descripción: </b>
+      <textarea name="descripcion_cc"  id="descripcion_cc" rows="4" cols="60" placeholder="Descripción del tipo de platillo" class="form-control" value="" required>{{tipo.descripcion_cc}}</textarea><br>
+      <br>
+      <center>
+        <button type="submit" name="button"
+        class="btn btn-outline-success">
+          &nbsp;&nbsp;&nbsp;Guardar&nbsp;&nbsp;&nbsp;
+        </button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/listadoTipos/"
+        class="btn btn-outline-danger">
+          Cancelar
+        </a>
+      </center>
+    </form>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  $("#frm_nuevo_tipo").validate({
+    rules:{
+      "nombre_cc":{
+        required:true
+      },
+      "dificultad_cc":{
+        required:true
+      },
+      "descripcion_cc":{
+        required:true
+      }
+    },
+    messages:{
+      "nombre_cc":{
+        required:"Debe ingresar el nombre del tipo de platillo",
+      },
+      "dificultad_cc":{
+        required:"Debe ingresar la dificultad del tipo de platillo"
+      },
+      "descripcion_cc":{
+        required:"Debe ingresar la descripción del tipo de platillo"
+      }
+    }
+  });
+</script>
+{% endblock %}

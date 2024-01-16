@@ -1,0 +1,198 @@
+{% extends "./plantilla.html" %}
+{% block contenido %}
+    <h1><i class="fa-solid fa-jar-wheat"></i> Listado de Recetas</h1>
+    <div class="row">
+      <div class="col-md-5">
+        <form class="" action="/guardarReceta/" method="post" enctype="multipart/form-data" id="frm_nueva_receta">
+          {% csrf_token %}
+          <b>Platillo: </b>
+          <select class="form-control" name="id_platillo" id="id_platillo" required>
+            <option value="">Seleccione el Platillo</option>
+            {% for platillo in platillos %}
+            <option value="{{platillo.id_cc}}">{{platillo.nombre_cc}}</option>
+            {% endfor %}
+          </select>
+          <br>
+          <b>Ingrediente: </b>
+          {% for ingrediente in ingredientes %}
+              <div class="checkbox">
+                  <label for="checkboxes-{{ ingrediente.id_cc }}" required>
+                      <input type="checkbox" name="id_ingrediente" id="checkboxes-{{ ingrediente.id_cc }}" value="{{ ingrediente.id_cc }}">
+                      {{ ingrediente.nombre_cc }}
+                  </label>
+              </div>
+          {% endfor %}
+          <br>
+          <b>Duración:</b>
+          <input type="text" name="tiempo_cc" id="tiempo_cc" value="" placeholder="Ingrese el tiempo de desarrollo de la receta" class="form-control" required><br>
+          <b>Origen de la Receta: </b>
+          <input type="text" name="origen_cc" id="origen_cc" value="" placeholder="Ingrese el origen de la receta" class="form-control" required ><br>
+
+          <script>
+            document.getElementById('origen_cc').addEventListener('input', function() {
+              var inputLetras = document.getElementById('origen_cc');
+              var valor = inputLetras.value;
+
+              var soloLetras = valor.replace(/[^A-Za-z]/g, '');
+
+              inputLetras.value = soloLetras;
+            });
+          </script>
+
+          <b>Indicaciones: </b>
+          <textarea name="indicaciones_cc" rows="3" cols="80" id="indicaciones_cc" class="form-control" placeholder="Ingrese las indicaciones"></textarea><br>
+          &nbsp; &nbsp;&nbsp;<button type="submit" name="button" class="btn btn-outline-success">Guardar</button>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <button type="reset" name="button" class="btn btn-outline-danger">Cancelar</button>
+        </form>
+      </div>
+      <div class="col-md-7">
+        <br>
+        <table class="table" id="tbl_receta">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>PLATILLO</th>
+              <th>INGREDIENTES</th>
+              <th>TIEMPO</th>
+              <th>ORIGEN</th>
+              <th>INDICACIONES</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for receta in recetas %}
+              <tr>
+                <td>{{receta.id_cc}}</td>
+                <td>{{receta.platillo_cc.nombre_cc}}</td>
+                <td>
+                {% for ingrediente in receta.ingrediente_cc.all %}
+                  {{ ingrediente.nombre_cc }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              </td>
+                <td>{{receta.tiempo_cc}}</td>
+                <td>{{receta.origen_cc}}</td>
+                <td>{{receta.indicaciones_cc}}</td>
+                <td>
+                      <a href="/editarReceta/{{receta.id_cc}}" class="btn btn-outline-secondary">Editar</a><br><br>
+                      <a href="javascript:void(0)"onclick="eliminarReceta('/eliminarReceta/{{receta.id_cc}}');" class="btn btn-outline-warning">Eliminar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+            function eliminarReceta(url){
+              iziToast.question({
+                  timeout: 15000,
+                  close: true,
+                  overlay: true,
+                  displayMode: 'once',
+                  id: 'question',
+                  zindex: 999,
+                  title: 'CONFIRMACIÓN',
+                  message: '¿Está seguro de eliminar el <b>detalle </b> seleccionado?',
+                  position: 'center',
+                  buttons: [
+                      ['<button><b>SI</b></button>', function (instance, toast) {
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                          window.location.href=url;
+                      }, true],
+                      ['<button>NO</button>', function (instance, toast) {
+
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                      }],
+                  ]
+              });
+            }
+
+            // Muestra un mensaje de éxito para el guardado
+    {% if messages %}
+        {% for message in messages %}
+            iziToast.success({
+                title: 'Éxito',
+                message: '{{ message }}',
+                position: 'topRight',
+            });
+        {% endfor %}
+    {% endif %}
+      </script>
+    <script type="text/javascript">
+      $("#frm_nueva_receta").validate({
+        rules:{
+          "id_platillo":{
+            required:true
+          },
+          "id_ingrediente":{
+            required:true
+          },
+          "tiempo_cc":{
+            required:true
+          },
+          "origen_cc":{
+            required:true,
+          },
+          "indicaciones_cc":{
+            required:true,
+          }
+        },
+        messages:{
+          "id_platillo":{
+            required:"Debe ingresar el platillo"
+          },
+          "id_ingrediente":{
+            required:"Debe ingresar el ingrediente"
+          },
+          "tiempo_cc":{
+            required:"Debe ingresar el tiempo de receta"
+          },
+          "origen_cc":{
+            required:"Debe ingresar el origen de la receta"
+          },
+          "indicaciones_cc":{
+            required:"Debe ingresar las indicaciones de la receta"
+          }
+        }
+      });
+    </script>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#tbl_receta').DataTable( {
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa-solid fa-file-pdf"></i> Exportar a PDF',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE RECETAS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa-solid fa-print"></i> Imprimir',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE RECETAS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fa-solid fa-file-csv"></i> Exportar a CSV',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE RECETAS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    }
+                ],
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                }
+            } );
+        } );
+    </script>
+{% endblock %}

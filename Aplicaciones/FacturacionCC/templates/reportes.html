@@ -1,0 +1,78 @@
+{% extends "./plantilla.html" %}
+{% block contenido %}
+    <h1><i class="fa-solid fa-list"></i> REPORTES GENERALES</h1>
+
+        <table class="table-success table-striped" id="tbl_reporte">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>CLIENTE</th>
+              <th>CEDULA</th>
+              <th>PEDIDO EL:</th>
+              <th>PLATILLOS</th>
+              <th>MESA</th>
+              <th>TIPO DE PAGO</th>
+              <th>TIPO DE SERVICIO</th>
+              <th>DESCRIPCIÓN</th>
+              <th>COSTO TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for detalle in detalles %}
+              <tr>
+                <td>{{detalle.id_cc}}</td>
+                <td>{{detalle.pedido_cc.cliente_cc.nombre_cc}}</td>
+                <td>{{detalle.pedido_cc.cliente_cc.cedula_cc}}</td>
+                <td>{{detalle.pedido_cc.fecha_cc}}</td>
+                <td>
+                  {% for platillo in detalle.platillo_cc.all %}
+                  {{ platillo.nombre_cc }} - $ {{ platillo.costou_cc }}
+                  {% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                </td>
+                <td>{{detalle.mesa_cc}}</td>
+                <td>{{detalle.pedido_cc.tipopago_cc}}</td>
+                <td>{{detalle.pedido_cc.servicio_cc}}</td>
+                <td>{{detalle.descripcion_cc}}</td>
+                <td>$ {{detalle.costot_cc}}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('#tbl_reporte').DataTable( {
+                    dom: 'Bfrtip',
+                    buttons: [
+                        {
+                            extend: 'pdfHtml5',
+                            text: '<i class="fa-solid fa-file-pdf"></i> Exportar a PDF',
+                            className: 'button2',
+                            messageTop: 'REPORTE GENERAL ',
+                            title:'INFORMACIÓN RestauranteCC'
+                        },
+                        {
+                            extend: 'print',
+                            text: '<i class="fa-solid fa-print"></i> Imprimir',
+                            className: 'button2',
+                            messageTop: 'REPORTE GENERAL ',
+                            title:'INFORMACIÓN RestauranteCC'
+                        },
+                        {
+                            extend: 'csv',
+                            text: '<i class="fa-solid fa-file-csv"></i>Exportar a CSV',
+                            className: 'button2',
+                            messageTop: 'REPORTE GENERAL ',
+                            title:'INFORMACIÓN RestauranteCC'
+                        }
+                    ],
+                    language: {
+                        url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                    }
+                } );
+            } );
+        </script>
+
+{% endblock %}

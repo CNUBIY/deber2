@@ -1,0 +1,108 @@
+{# heredando header y footer #}
+{% extends "./plantilla.html" %}
+{% load static %}
+
+{% block contenido %}
+<h1 style="text-align:center;"> <i class="fas fa-edit"></i> Edita tu información</h1>
+<div class="row">
+  <div class="col-md-2">
+  </div>
+  <div class="col-md-8">
+    <br> <br>
+    <form class="" action="/procesarActualizacionDetalle/{{detalle.id_cc}} %}" method="post" id="frm_nuevo_detalle">
+      <b>Pedido: </b>
+      {% csrf_token %}
+      <select class="form-control" name="id_pedido" id="id_pedido" required>
+        <option value="">Seleccione el pedido:</option>
+        {% for pedido in pedido %}
+        <option value="{{pedido.id_cc}}">{{pedido.fecha_cc}}</option>
+        {% endfor %}
+      </select>
+      <br>
+      <b>Platillo: </b>
+      {% for platillo in platillo %}
+          <div class="form-group">
+              <div class="checkbox">
+                  <label for="checkboxes-{{ platillo.id_cc }}">
+                      <input type="checkbox" name="id_platillo" id="checkboxes-{{ platillo.id_cc }}" value="{{ platillo.id_cc }}">
+                      {{ platillo.nombre_cc }} - {{platillo.costou_cc}}
+                  </label>
+
+              </div>
+          </div>
+      {% endfor %}
+      <br>
+      <input type="hidden" name="id_cc"  value="{{detalle.id_cc}}">
+      <b>Mesa del pedido: </b>
+      <input type="number" name="mesa_cc" id="mesa_cc"
+      value="{{detalle.mesa_cc}}" placeholder="Ingrese la cantidad"
+      class="form-control" required step="0.01">
+      <br>
+      <b>Descripción: </b>
+      <textarea name="descripcion_cc" rows="3" cols="80" id="descripcion_cc" class="form-control" placeholder="Ingrese las indicaciones (Opcional)">{{detalle.descripcion_cc}}</textarea><br>
+      <br>
+      <b>Costo Total: </b>
+      <input type="text" name="costot_cc" id="costot_cc"
+      value="" placeholder="Ingrese el valor total"
+      class="form-control" required step="0.01">
+      <br>
+        <center>
+        <button type="submit" name="button"
+        class="btn btn-outline-success">
+          &nbsp;&nbsp;&nbsp;Guardar&nbsp;&nbsp;&nbsp;
+        </button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/"
+        class="btn btn-outline-danger">
+          Cancelar
+        </a>
+      </center>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $("#frm_nuevo_detalle").validate({
+    rules:{
+      "id_pedido":{
+        required:true
+      },
+      "id_platillo":{
+        required:true
+      },
+      "mesa_cc":{
+        required:true,
+        minlength:1,
+        maxlength:2
+      },
+      "costot_cc":{
+        required:true,
+         min: 0,
+         number:true,
+         maxlength:7
+      }
+    },
+    messages:{
+      "id_pedido":{
+        required:"Por favor seleccione el pedido"
+      },
+      "id_platillo":{
+        required:"Por favor seleccione al menos un platillo"
+      },
+      "mesa_cc":{
+        required:"Debe ingresar el número de mesa solicitada",
+        minlength:"La mesa puede tener entre 1-2 dígitos",
+        maxlength:"La mesa puede tener entre 1-2 dígitos"
+      },
+
+      "costot_cc":{
+        required:"Debe ingresar el costo total",
+         min: "No puede ingresar números negativos",
+         number:"Ingrese un valor válido",
+         maxlength:"Precio excedido",
+         step:"Precio inválido"
+      }
+    }
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends "./plantilla.html" %}
+{% block contenido %}
+    <h1><i class="fas fa-carrot"></i> Listado de Ingredientes</h1>
+    <div class="row">
+      <div class="col-md-5">
+        <form class="" action="/guardarIngrediente/" method="post" enctype="multipart/form-data" id="frm_nuevo_ingrediente">
+          {% csrf_token %}
+          <br>
+          <b>Nombre del ingrediente:</b>
+          <input type="text" name="nombre_cc" id="nombre_cc" value="" placeholder="Ingrese el nombre del ingrediente" class="form-control" required><br>
+
+          <script>
+            document.getElementById('nombre_cc').addEventListener('input', function() {
+              var inputLetras = document.getElementById('nombre_cc');
+              var valor = inputLetras.value;
+
+              var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+              inputLetras.value = soloLetras;
+            });
+          </script>
+
+
+          <b>Tipo de Ingrediente: </b>
+          <input type="text" name="tipo_cc" id="tipo_cc" value="" placeholder="Ingrese el tipo de ingrediente" class="form-control" required><br>
+
+          <script>
+            document.getElementById('tipo_cc').addEventListener('input', function() {
+              var inputLetras = document.getElementById('tipo_cc');
+              var valor = inputLetras.value;
+
+              var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+              inputLetras.value = soloLetras;
+            });
+          </script>
+
+
+          <b>Foto del Ingrediente: </b>
+          <input type="file" name="foto_cc" id="foto_cc" value="" placeholder="Seleccione la foto del ingrediente" class="form-control-file" accept="image/*" required><br>
+          &nbsp; &nbsp;&nbsp;<button type="submit" name="button" class="btn btn-outline-success">Guardar</button>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <button type="reset" name="button" class="btn btn-outline-danger">Cancelar</button>
+        </form>
+      </div>
+      <div class="col-md-7">
+        <br>
+        <table class="table" id="tbl_ingrediente">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>NOMBRE</th>
+              <th>TIPO</th>
+              <th>FOTO</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ingrediente in ingredientes %}
+              <tr>
+                <td>{{ingrediente.id_cc}}</td>
+                <td>{{ingrediente.nombre_cc}}</td>
+                <td>{{ingrediente.tipo_cc}}</td>
+                <td>
+                  {% if ingrediente.foto_cc %}
+                  <a href="{{ingrediente.foto_cc.url}}" alt="" target="_blank">
+                  <img src="{{ingrediente.foto_cc.url}}" alt="" style="width:100%; height:60px;"></a>
+                  {% else %}
+                    <b>N/A</b>
+                  {% endif %}
+                </td>
+                <td>
+                    <a href="/editarIngrediente/{{ingrediente.id_cc}}" class="btn btn-outline-secondary">Editar</a>&nbsp;&nbsp;&nbsp;
+                    <a href="javascript:void(0)"onclick="eliminarIngrediente('/eliminarIngrediente/{{ingrediente.id_cc}}');" class="btn btn-outline-warning">Eliminar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+            function eliminarIngrediente(url){
+              iziToast.question({
+                  timeout: 15000,
+                  close: true,
+                  overlay: true,
+                  displayMode: 'once',
+                  id: 'question',
+                  zindex: 999,
+                  title: 'CONFIRMACIÓN',
+                  message: '¿Está seguro de eliminar el <b>ingrediente </b> seleccionado?',
+                  position: 'center',
+                  buttons: [
+                      ['<button><b>SI</b></button>', function (instance, toast) {
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                          window.location.href=url;
+                      }, true],
+                      ['<button>NO</button>', function (instance, toast) {
+
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                      }],
+                  ]
+              });
+            }
+
+
+    {% if messages %}
+        {% for message in messages %}
+            iziToast.success({
+                title: 'Éxito',
+                message: '{{ message }}',
+                position: 'topRight',
+            });
+        {% endfor %}
+    {% endif %}
+      </script>
+    <script type="text/javascript">
+      $("#frm_nuevo_ingrediente").validate({
+        rules:{
+          "nombre_cc":{
+            required:true
+          },
+          "tipo_cc":{
+            required:true
+          },
+          "foto_cc":{
+            required:true
+          }
+        },
+        messages:{
+          "nombre_cc":{
+            required:"Debe ingresar el nombre del ingrediente"
+          },
+          "tipo_cc":{
+            required:"Debe ingresar el tipo de ingrediente"
+          },
+          "foto_cc":{
+            required:"Debe ingresar la foto del Ingrediente"
+          }
+        }
+      });
+    </script>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#tbl_ingrediente').DataTable( {
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa-solid fa-file-pdf"></i> Exportar a PDF',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE INGREDIENTES ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa-solid fa-print"></i> Imprimir',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE INGREDIENTES ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fa-solid fa-file-csv"></i> Exportar a CSV',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE INGREDIENTES ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    }
+                ],
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                }
+            } );
+        } );
+    </script>
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends "./plantilla.html" %}
+{% block contenido %}
+    <h1><i class="fas fa-drumstick-bite"></i> Listado de Platillos</h1>
+    <div class="row">
+      <div class="col-md-5">
+        <form class="" action="/guardarPlatillo/" method="post" enctype="multipart/form-data" id="frm_nuevo_platillo">
+          {% csrf_token %}
+          <b>Tipo de Platillo: </b>
+          <select class="form-control" name="id_tipo" id="id_tipo" required>
+            <option value="">Seleccione el tipo de platillo:</option>
+            {% for tipo in tipos %}
+            <option value="{{tipo.id_cc}}">{{tipo.nombre_cc}}</option>
+            {% endfor %}
+          </select>
+          <br>
+          <b>Nombre del Platillo:</b>
+          <input type="text" name="nombre_cc" id="nombre_cc" value="" placeholder="Ingrese el nombre del platillo" class="form-control" required><br>
+
+          <script>
+            document.getElementById('nombre_cc').addEventListener('input', function() {
+              var inputLetras = document.getElementById('nombre_cc');
+              var valor = inputLetras.value;
+
+              var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+              inputLetras.value = soloLetras;
+            });
+          </script>
+
+
+          <b>Costo del platillo: </b>
+          <input type="number" name="costou_cc" id="costou_cc" value="" placeholder="Ingrese el precio del platillo" class="form-control" step="0.01" required><br>
+          <b>Foto del platillo: </b>
+          <input type="file" name="foto_cc" id="foto_cc" value="" placeholder="Seleccione la foto del platillo" class="form-control-file" accept="image/*" required><br>
+          &nbsp; &nbsp;&nbsp;<button type="submit" name="button" class="btn btn-outline-success">Guardar</button>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <button type="reset" name="button" class="btn btn-outline-danger">Cancelar</button>
+        </form>
+      </div>
+      <div class="col-md-7">
+        <br>
+        <table class="table" id="tbl_platillo">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>NOMBRE</th>
+              <th>COSTO</th>
+              <th>TIPO</th>
+              <th>IMAGEN</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for platillo in platillos %}
+              <tr>
+                <td>{{platillo.id_cc}}</td>
+                <td>{{platillo.nombre_cc}}</td>
+                <td>{{platillo.costou_cc}}</td>
+                <td>{{platillo.tipo_cc.nombre_cc}}</td>
+                <td>
+                  {% if platillo.foto_cc %}
+                  <a href="{{platillo.foto_cc.url}}" alt="" target="_blank">
+                  <img src="{{platillo.foto_cc.url}}" alt="" style="width:100%; height:50px;"></a>
+                  {% else %}
+                    <b>N/A</b>
+                  {% endif %}
+                </td>
+                <td>
+                      <a href="/editarPlatillo/{{platillo.id_cc}}" class="btn btn-outline-secondary">Editar</a><br><br>
+                      <a href="javascript:void(0)"onclick="eliminarPlatillo('/eliminarPlatillo/{{platillo.id_cc}}');" class="btn btn-outline-warning">Eliminar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+            function eliminarPlatillo(url){
+              iziToast.question({
+                  timeout: 15000,
+                  close: true,
+                  overlay: true,
+                  displayMode: 'once',
+                  id: 'question',
+                  zindex: 999,
+                  title: 'CONFIRMACIÓN',
+                  message: '¿Está seguro de eliminar el <b>platillo </b> seleccionado?',
+                  position: 'center',
+                  buttons: [
+                      ['<button><b>SI</b></button>', function (instance, toast) {
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                          window.location.href=url;
+                      }, true],
+                      ['<button>NO</button>', function (instance, toast) {
+
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                      }],
+                  ]
+              });
+            }
+
+            // Muestra un mensaje de éxito para el guardado
+    {% if messages %}
+        {% for message in messages %}
+            iziToast.success({
+                title: 'Éxito',
+                message: '{{ message }}',
+                position: 'topRight',
+            });
+        {% endfor %}
+    {% endif %}
+      </script>
+    <script type="text/javascript">
+      $("#frm_nuevo_platillo").validate({
+        rules:{
+          "id_tipo":{
+            required:true
+          },
+          "nombre_cc":{
+            required:true
+          },
+          "costou_cc":{
+            required:true,
+             min: 0,
+             number:true,
+             maxlength:7
+          },
+          "foto_cc":{
+            required:true
+          }
+        },
+        messages:{
+          "id_tipo":{
+            required:"Por favor seleccione el tipo de platillo"
+          },
+          "nombre_cc":{
+            required:"Debe ingresar el nombre del platillo"
+          },
+          "costou_cc":{
+            required:"Debe ingresar el costo unitario",
+             min: "No puede ingresar números negativos",
+             number:"Ingrese un valor válido",
+             maxlength:"Precio excedido",
+             step:"Precio inválido"
+          },
+          "foto_cc":{
+            required:"Debe ingresar la foto del platillo"
+          }
+        }
+      });
+    </script>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#tbl_platillo').DataTable( {
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa-solid fa-file-pdf"></i> Exportar a PDF',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE PLATILLOS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa-solid fa-print"></i> Imprimir',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE PLATILLOS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fa-solid fa-file-csv"></i> Exportar a CSV',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE PLATILLOS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    }
+                ],
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                }
+            } );
+        } );
+    </script>
+{% endblock %}

@@ -1,0 +1,108 @@
+{# heredando header y footer #}
+{% extends "./plantilla.html" %}
+{% load static %}
+
+{% block contenido %}
+<h1 style="text-align:center;"> <i class="fas fa-edit"></i> Edita tu información</h1>
+<div class="row">
+  <div class="col-md-2">
+  </div>
+  <div class="col-md-8">
+    <br> <br>
+    <form class="" action="/procesarActualizacionPedido/{{pedido.id_cc}} %}" method="post" id="frm_nuevo_pedido">
+      <b>Cliente: </b>
+      {% csrf_token %}
+      <select class="form-control" name="id_cliente" id="id_cliente">
+        <option value="">Seleccione el cliente</option>
+        {% for cliente in cliente %}
+        <option value="{{cliente.id_cc}}">{{cliente.nombre_cc}}</option>
+        {% endfor %}
+      </select>
+      <br>
+      <input type="hidden" name="id_cc"  value="{{pedido.id_cc}}">
+      <b>Fecha y Hora de actualización del pedido: </b>
+      <input type="datetime-local" name="fecha_cc" id="fecha_cc"
+      value="{{pedido.fecha_cc}}" placeholder=""
+      class="form-control" required>
+      <br>
+      <b>Tipo de pago: </b>
+      <input type="text" name="tipopago_cc" id="tipopago_cc"
+      value="{{pedido.tipopago_cc}}" placeholder="Ingrese el tipo de pago del pedido"
+      class="form-control" required>
+      <br>
+
+      <script>
+        document.getElementById('tipopago_cc').addEventListener('input', function() {
+          var inputLetras = document.getElementById('tipopago_cc');
+          var valor = inputLetras.value;
+
+          var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+          inputLetras.value = soloLetras;
+        });
+      </script>
+
+      <b>Tipo de servicio: </b>
+      <input type="text" name="servicio_cc" id="servicio_cc"
+      value="{{pedido.servicio_cc}}" placeholder="Ingrese el tipo de servicio del pedido"
+      class="form-control" required>
+      <br>
+
+      <script>
+        document.getElementById('servicio_cc').addEventListener('input', function() {
+          var inputLetras = document.getElementById('servicio_cc');
+          var valor = inputLetras.value;
+
+          var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+          inputLetras.value = soloLetras;
+        });
+      </script>
+        <center>
+        <button type="submit" name="button"
+        class="btn btn-outline-success">
+          &nbsp;&nbsp;&nbsp;Guardar&nbsp;&nbsp;&nbsp;
+        </button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/listadoPedidos"
+        class="btn btn-outline-danger">
+          Cancelar
+        </a>
+      </center>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $("#frm_nuevo_pedido").validate({
+    rules:{
+      "id_cliente":{
+        required:true
+      },
+      "fecha_cc":{
+        required:true
+      },
+      "tipopago_cc":{
+        required:true
+      },
+      "servicio_cc":{
+        required:true
+      }
+    },
+    messages:{
+      "id_cliente":{
+        required:"Por favor seleccione el cliente del pedido"
+      },
+      "fecha_cc":{
+        required:"Debe ingresar la fecha y hora del pedido"
+      },
+      "tipopago_cc":{
+        required:"Debe ingresar el tipo de pago del pedido"
+      },
+      "servicio_cc":{
+        required:"Debe ingresar el tipo de servicio del pedido"
+      }
+    }
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "./plantilla.html" %}
+{% block contenido %}
+    <h1><i class="fa fa-shopping-cart" aria-hidden="true"></i> Listado de Pedidos</h1>
+    <div class="row">
+      <div class="col-md-5">
+        <form class="" action="/guardarPedido/" method="post" enctype="multipart/form-data" id="frm_nuevo_pedido">
+          {% csrf_token %}
+          <b>Cliente: </b>
+          <select class="form-control" name="id_cliente" id="id_cliente" required>
+            <option value="">Seleccione su cliente:</option>
+            {% for cliente in clientes %}
+            <option value="{{cliente.id_cc}}">{{cliente.nombre_cc}}</option>
+            {% endfor %}
+          </select>
+          <br>
+          <b>Fecha y Hora del pedido:</b>
+          <input type="datetime-local" name="fecha_cc" id="fecha_cc" value="" placeholder="Ingrese la fecha y hora del pedido" class="form-control" required><br>
+          <b>Tipo de pago: </b>
+          <input type="text" name="tipopago_cc" id="tipopago_cc" value="" placeholder="Ingrese el tipo de pago" class="form-control" required><br>
+
+          <script>
+            document.getElementById('tipopago_cc').addEventListener('input', function() {
+              var inputLetras = document.getElementById('tipopago_cc');
+              var valor = inputLetras.value;
+
+              var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+              inputLetras.value = soloLetras;
+            });
+          </script>
+
+
+          <b>Servicio: </b>
+          <input type="text" name="servicio_cc" id="servicio_cc" value="" placeholder="Ingrese el tipo de servicio del pedido" class="form-control" required><br>
+
+          <script>
+            document.getElementById('servicio_cc').addEventListener('input', function() {
+              var inputLetras = document.getElementById('servicio_cc');
+              var valor = inputLetras.value;
+
+              var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+              inputLetras.value = soloLetras;
+            });
+          </script>
+
+
+          &nbsp; &nbsp;&nbsp;<button type="submit" name="button" class="btn btn-outline-success">Guardar</button>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <button type="reset" name="button" class="btn btn-outline-danger">Cancelar</button>
+        </form>
+      </div>
+      <div class="col-md-7">
+        <br>
+        <table class="table" id="tbl_pedido">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>PEDIDO DE</th>
+              <th>FECHA Y HORA</th>
+              <th>TIPO DE PAGO</th>
+              <th>TIPO DE SERVICIO</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pedido in pedidos %}
+              <tr>
+                <td>{{pedido.id_cc}}</td>
+                <td>{{pedido.cliente_cc.nombre_cc}}</td>
+                <td>{{pedido.fecha_cc}}</td>
+                <td>{{pedido.tipopago_cc}}</td>
+                <td>{{pedido.servicio_cc}}</td>
+                <td>
+                      <a href="/editarPedido/{{pedido.id_cc}}" class="btn btn-outline-secondary">Editar</a><br><br>
+                      <a href="javascript:void(0)"onclick="eliminarPedido('/eliminarPedido/{{pedido.id_cc}}');" class="btn btn-outline-warning">Eliminar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+            function eliminarPedido(url){
+              iziToast.question({
+                  timeout: 15000,
+                  close: true,
+                  overlay: true,
+                  displayMode: 'once',
+                  id: 'question',
+                  zindex: 999,
+                  title: 'CONFIRMACIÓN',
+                  message: '¿Está seguro de eliminar el <b>pedido </b> seleccionado?',
+                  position: 'center',
+                  buttons: [
+                      ['<button><b>SI</b></button>', function (instance, toast) {
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+                          window.location.href=url;
+                      }, true],
+                      ['<button>NO</button>', function (instance, toast) {
+
+                          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+
+                      }],
+                  ]
+              });
+            }
+
+            // Muestra un mensaje de éxito para el guardado
+    {% if messages %}
+        {% for message in messages %}
+            iziToast.success({
+                title: 'Éxito',
+                message: '{{ message }}',
+                position: 'topRight',
+            });
+        {% endfor %}
+    {% endif %}
+      </script>
+    <script type="text/javascript">
+      $("#frm_nuevo_pedido").validate({
+        rules:{
+          "id_cliente":{
+            required:true
+          },
+          "fecha_cc":{
+            required:true
+          },
+          "tipopago_cc":{
+            required:true
+          },
+          "servicio_cc":{
+            required:true
+          }
+        },
+        messages:{
+          "id_cliente":{
+            required:"Por favor seleccione el cliente del pedido"
+          },
+          "fecha_cc":{
+            required:"Debe ingresar la fecha y hora del pedido"
+          },
+          "tipopago_cc":{
+            required:"Debe ingresar el tipo de pago del pedido"
+          },
+          "servicio_cc":{
+            required:"Debe ingresar el tipo de servicio del pedido"
+          }
+        }
+      });
+    </script>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#tbl_pedido').DataTable( {
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa-solid fa-file-pdf"></i> Exportar a PDF',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE PEDIDOS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa-solid fa-print"></i> Imprimir',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE PEDIDOS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fa-solid fa-file-csv"></i> Exportar a CSV',
+                        className: 'button2',
+                        messageTop: 'REPORTE DE PEDIDOS ',
+                        title:'INFORMACIÓN RestauranteCC'
+                    }
+                ],
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                }
+            } );
+        } );
+    </script>
+{% endblock %}

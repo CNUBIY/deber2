@@ -1,0 +1,101 @@
+{# heredando header y footer #}
+{% extends "./plantilla.html" %}
+{% load static %}
+
+{% block contenido %}
+<h1 style="text-align:center;"> <i class="fas fa-edit"></i> Edita tu información</h1>
+<div class="row">
+  <div class="col-md-2">
+  </div>
+  <div class="col-md-8">
+    <br> <br>
+    <form class="" action="/procesarActualizacionCliente/{{cliente.id_ac}} %}" method="post" id="frm_nuevo_cliente">
+      <b>Provincia de Cliente: </b>
+      {% csrf_token %}
+      <select class="form-control" name="id_provincia" id="id_provincia">
+        <option value="">Seleccione la provincia del cliente</option>
+        {% for provincia in provincia %}
+        <option value="{{provincia.id_cc}}">{{provincia.nombre_cc}}</option>
+        {% endfor %}
+      </select>
+      <br>
+      <input type="hidden" name="id_cc"  value="{{cliente.id_cc}}">
+      <b>Cédula: </b>
+      <input type="number" name="cedula_cc" id="cedula_cc"
+      value="{{cliente.cedula_cc}}" placeholder="Ingrese la cédula del cliente"
+      class="form-control" required>
+      <br>
+      <b>Nombres: </b>
+      <input type="text" name="nombre_cc" id="nombre_cc"
+      value="{{cliente.nombre_cc}}" placeholder="Ingrese el nombre del cliente"
+      class="form-control" required>
+
+      <script>
+        document.getElementById('nombre_cc').addEventListener('input', function() {
+          var inputLetras = document.getElementById('nombre_cc');
+          var valor = inputLetras.value;
+
+          var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+          inputLetras.value = soloLetras;
+        });
+      </script>
+
+
+      <br>
+      <b>Correo: </b>
+      <input type="email" name="correo_cc" id="correo_cc"
+      value="{{cliente.correo_cc}}" placeholder="Ingrese el correo del cliente"
+      class="form-control" required>
+      <br>
+        <center>
+        <button type="submit" name="button"
+        class="btn btn-outline-success">
+          &nbsp;&nbsp;&nbsp;Guardar&nbsp;&nbsp;&nbsp;
+        </button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/listadoClientes"
+        class="btn btn-outline-danger">
+          Cancelar
+        </a>
+      </center>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $("#frm_nuevo_cliente").validate({
+    rules:{
+      "id_provincia":{
+        required:true
+      },
+      "cedula_cc":{
+        required:true,
+        minlength:10,
+        maxlength:10
+      },
+      "nombre_cc":{
+        required:true
+      },
+      "correo_cc":{
+        required:true
+      }
+    },
+    messages:{
+      "id_provincia":{
+        required:"Por favor seleccione la provincia del cliente"
+      },
+      "cedula_cc":{
+        required:"Debe ingresar el número de cédula",
+        minlength:"La cedula debe tener 10 dígitos",
+        maxlength:"La cedula no debe tener más de 10 dígitos"
+      },
+      "nombre_cc":{
+        required:"Debe ingresar el nombre del cliente"
+      },
+      "correo_cc":{
+        required:"Debe ingresar el correo del cliente"
+      }
+    }
+  });
+</script>
+{% endblock %}

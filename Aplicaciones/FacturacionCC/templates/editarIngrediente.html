@@ -1,0 +1,96 @@
+{# heredando header y footer #}
+{% extends "./plantilla.html" %}
+{% load static %}
+
+{% block contenido %}
+<h1 style="text-align:center;"> <i class="fas fa-edit"></i> Edita tu información</h1>
+<div class="row">
+  <div class="col-md-2">
+  </div>
+  <div class="col-md-8">
+    <br> <br>
+    <form class="" action="/procesarActualizacionIngrediente/{{ingrediente.id_cc}} %}" enctype="multipart/form-data" method="post" id="frm_nuevo_ingrediente">
+        {% csrf_token %}
+      <br>
+      <input type="hidden" name="id_cc"  value="{{ingrediente.id_cc}}">
+      <b>Nombre del ingrediente: </b>
+      <input type="text" name="nombre_cc" id="nombre_cc"
+      value="{{ingrediente.nombre_cc}}" placeholder="Ingrese el nombre del ingrediente"
+      class="form-control" required>
+      <br>
+
+      <script>
+        document.getElementById('nombre_cc').addEventListener('input', function() {
+          var inputLetras = document.getElementById('nombre_cc');
+          var valor = inputLetras.value;
+
+          var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+          inputLetras.value = soloLetras;
+        });
+      </script>
+
+      <b>Tipo de ingrediente: </b>
+      <input type="text" name="tipo_cc" id="tipo_cc"
+      value="{{ingrediente.tipo_cc}}" placeholder="Ingrese el tipo de ingrediente"
+      class="form-control" required>
+
+      <script>
+        document.getElementById('tipo_cc').addEventListener('input', function() {
+          var inputLetras = document.getElementById('tipo_cc');
+          var valor = inputLetras.value;
+
+          var soloLetras = valor.replace(/[^A-Za-z\s]/g, '');
+
+          inputLetras.value = soloLetras;
+        });
+      </script>
+
+
+
+
+      <br>
+      <b>Foto: </b>
+      <input type="file" name="foto_cc" id="foto_cc" value="" placeholder="Seleccione la foto del ingrediente" class="form-control" accept="image/*" required><br>
+      <center>
+        <button type="submit" name="button"
+        class="btn btn-outline-success">
+          &nbsp;&nbsp;&nbsp;Guardar&nbsp;&nbsp;&nbsp;
+        </button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="/listadoIngredientes/"
+        class="btn btn-outline-danger">
+          Cancelar
+        </a>
+      </center>
+    </form>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  $("#frm_nuevo_ingrediente").validate({
+    rules:{
+      "nombre_cc":{
+        required:true
+      },
+      "tipo_cc":{
+        required:true
+      },
+      "foto_cc":{
+        required:true
+      }
+    },
+    messages:{
+      "nombre_cc":{
+        required:"Debe ingresar el nombre del ingrediente"
+      },
+      "tipo_cc":{
+        required:"Debe ingresar el tipo de ingrediente"
+      },
+      "foto_cc":{
+        required:"Debe ingresar el tiempo de vencimiento"
+      }
+    }
+  });
+</script>
+{% endblock %}
